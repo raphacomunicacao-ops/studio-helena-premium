@@ -112,6 +112,16 @@ function PixelRevealCanvas() {
     init()
     startLoop()
 
+    // Remove o div de prevenção de flash após o canvas pintar o primeiro frame
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const flash = document.getElementById('hero-flash')
+      if (flash) {
+        flash.style.transition = 'opacity 0.12s ease'
+        flash.style.opacity = '0'
+        setTimeout(() => flash.remove(), 150)
+      }
+    }))
+
     const resizeObserver = new ResizeObserver(() => init())
     if (wrapRef.current) resizeObserver.observe(wrapRef.current)
 
@@ -158,6 +168,8 @@ export function Hero() {
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1800&q=80)' }}
       />
       <div className="absolute inset-0 bg-black/55" />
+      {/* Previne flash da imagem antes do canvas inicializar */}
+      <div id="hero-flash" className="absolute inset-0" style={{ backgroundColor: 'rgb(10,10,10)', zIndex: 19 }} />
 
       <PixelRevealCanvas />
 

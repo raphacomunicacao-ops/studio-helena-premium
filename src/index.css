@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    hyphens: none !important;
+    -webkit-hyphens: none !important;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #FAFAF8;
+  color: #1a1a1a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+  min-height: 100svh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+}
+
+.font-serif-display {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+/* Shimmer sweep — headline Hero (gradiente do Pixel Perfect Hero / easemize) */
+.shimmer-headline {
+  color: transparent;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 1)   0%,
+    rgba(255, 255, 255, 0.4) 25%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.9) 55%,
+    rgba(255, 255, 255, 0.2) 75%,
+    rgba(255, 255, 255, 1)   100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.22);
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.35));
+  animation: shimmer-sweep 8s linear infinite;
+  animation-delay: 1.4s;
+}
+
+@keyframes shimmer-sweep {
+  0%   { background-position: 200% center; }
+  100% { background-position: 0% center; }
+}

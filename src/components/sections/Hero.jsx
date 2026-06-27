@@ -2,10 +2,9 @@ import { useRef, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import Container from '../Container'
 
-const GAP = 8
 const SPEED = 35
 
-function createPixel(ctx, canvas, x, y, baseSpeed, delay) {
+function createPixel(ctx, canvas, x, y, gap, baseSpeed, delay) {
   const rand = (min, max) => Math.random() * (max - min) + min
 
   const p = {
@@ -14,14 +13,14 @@ function createPixel(ctx, canvas, x, y, baseSpeed, delay) {
     size: 0,
     sizeStep: rand(0.18, 0.36),
     minSize: 0.5,
-    maxSize: rand(GAP * 0.4, GAP * 0.9),
+    maxSize: rand(gap * 0.4, gap * 0.9),
     delay,
     counter: 0,
     counterStep: rand(1.8, 3.2) + (canvas.width + canvas.height) * 0.008,
     isReverse: false,
     isShimmer: false,
     draw() {
-      const offset = GAP * 0.5 - p.size * 0.5
+      const offset = gap * 0.5 - p.size * 0.5
       ctx.clearRect(p.x + offset, p.y + offset, p.size, p.size)
     },
     appear() {
@@ -54,22 +53,31 @@ function PixelRevealCanvas() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    const mobile = window.innerWidth < 768
+    const gap = mobile ? 14 : 8
+    // Limitar resolução a 1x no mobile para não sobrecarregar o canvas
+    const dpr = mobile ? 1 : Math.min(window.devicePixelRatio || 1, 2)
+
     const { width, height } = wrap.getBoundingClientRect()
     const w = Math.floor(width)
     const h = Math.floor(height)
-    canvas.width = w
-    canvas.height = h
+    canvas.width = w * dpr
+    canvas.height = h * dpr
+    canvas.style.width = `${w}px`
+    canvas.style.height = `${h}px`
+    ctx.scale(dpr, dpr)
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const delayMult = mobile ? 0.1 : 0.18
     const spd = reduced ? 0 : Math.min(SPEED, 100) * 0.001
     const pixels = []
 
-    for (let x = 0; x < w; x += GAP) {
-      for (let y = 0; y < h; y += GAP) {
+    for (let x = 0; x < w; x += gap) {
+      for (let y = 0; y < h; y += gap) {
         const dx = x - w / 2
         const dy = y - h / 2
-        const delay = reduced ? 0 : Math.sqrt(dx * dx + dy * dy) * 0.18
-        pixels.push(createPixel(ctx, canvas, x, y, spd, delay))
+        const delay = reduced ? 0 : Math.sqrt(dx * dx + dy * dy) * delayMult
+        pixels.push(createPixel(ctx, canvas, x, y, gap, spd, delay))
       }
     }
     pixelsRef.current = pixels
@@ -90,8 +98,10 @@ function PixelRevealCanvas() {
       const ctx = canvas?.getContext('2d')
       if (!canvas || !ctx) return
 
+      const mobile = window.innerWidth < 768
+      const dpr = mobile ? 1 : Math.min(window.devicePixelRatio || 1, 2)
       ctx.fillStyle = 'rgba(10, 10, 10, 0.97)'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr)
       for (const p of pixelsRef.current) p.appear()
     }
 
